@@ -1,55 +1,50 @@
 pipeline {
     agent any
+    tools{
+        maven 'maven'
+        jdk 'jdk-11'
+    }
 
     stages {
-        stage('Clean') {
+    stage('Git checkout') {
             steps {
-                bat 'mvn clean'
+                git branch: 'main', credentialsId: 'github_credential', url: 'https://github.com/sunithabidugu/Payment-Service.git'
             }
         }
-        stage('Build') {
+
+ 
+
+ 
+
+        stage('Build'){
             steps {
-                bat 'mvn compile'
+                bat "mvn clean install -DskipTests"
             }
         }
+
+ 
+
+ 
+
         stage('Test') {
             steps {
                 bat 'mvn test'
             }
         }
-        stage('Package') {
+        stage('SonarQube Analysis') {
             steps {
-                bat 'mvn package'
-            }
-            post {
-                always {
-                    // One or more steps need to be included within each condition's block.
-                    junit 'target/surefire-reports/*.xml'
+                    bat 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.8.0.2131:sonar -Dsonar.login=admin -Dsonar.password=Sunitha@2028'
                 }
-                success {
-                    archiveArtifacts artifacts: 'target/*.jar', followSymlinks: false
-                }
-            }
         }
-        stage('Deploy') {
-            steps {
-                withEnv(['JENKINS_NODE_COOKIE=dontKillMe']) {
-                    bat 'java -jar -DServer.port=9090 target\\User-Service1-0.0.1-SNAPSHOT.jar'
-                }
-            }
-        }
+
+ 
+
+ 
+
+       stage("Deployment") {
+           steps{
+    bat 'start /B mvnw spring-boot:run -Dserver.port=8001'
+}
+       }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
