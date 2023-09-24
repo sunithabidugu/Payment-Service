@@ -5,12 +5,23 @@ pipeline {
         jdk 'jdk-11'
     }
 
+ 
     stages {
-    stage('Git checkout') {
+        stage('Checkout') {
             steps {
-                git branch: 'main', credentialsId: 'github_credential', url: 'https://github.com/sunithabidugu/Payment-Service.git'
+                script {
+                    // Use the Git tool named "Default Git" (or the name you configured)
+                    // and the credential with ID "github_credential"
+                    checkout([$class: 'GitSCM', branches: [[name: '*/main']],
+                              doGenerateSubmoduleConfigurations: false,
+                              extensions: [[$class: 'CloneOption', gitToolName: 'Default Git', credentialsId: 'github_credential']],
+                              submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/sunithabidugu/Payment-Service.git']]])
+                }
             }
         }
+      
+    }
+
 
  
 
