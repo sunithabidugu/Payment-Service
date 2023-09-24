@@ -8,7 +8,7 @@ pipeline {
     stages {
     stage('Git checkout') {
             steps {
-                git branch: 'main', credentialsId: 'github_credential', url: 'https://github.com/RELLI-SANTHI/Kanban-Project-Service.git'
+                git branch: 'main', credentialsId: 'github_credential', url: 'https://github.com/sunithabidugu/Payment-Service.git'
             }
         }
 
@@ -33,7 +33,7 @@ pipeline {
         }
         stage('SonarQube Analysis') {
             steps {
-                    bat 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.8.0.2131:sonar -Dsonar.login=admin -Dsonar.password=Santhi@2001'
+                    bat 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.8.0.2131:sonar -Dsonar.login=admin -Dsonar.password=Sunitha@2028'
                 }
         }
 
