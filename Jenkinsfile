@@ -1,63 +1,55 @@
 pipeline {
     agent any
-    tools{
-        maven 'maven'
-        jdk 'jdk-11'
-    }
 
- 
     stages {
-        stage('Checkout') {
+        stage('Clean') {
             steps {
-                script {
-                    // Use the Git tool named "Default Git" (or the name you configured)
-                    // and the credential with ID "github_credential"
-                    checkout([$class: 'GitSCM', branches: [[name: '*/main']],
-                              doGenerateSubmoduleConfigurations: false,
-                              extensions: [[$class: 'CloneOption', gitToolName: 'Default Git', credentialsId: 'github_credential']],
-                              submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/sunithabidugu/Payment-Service.git']]])
-                }
+                bat 'mvn clean'
             }
         }
-      
-    }
-
-
- 
-
- 
-
-        stage('Build'){
+        stage('Build') {
             steps {
-                bat "mvn clean install -DskipTests"
+                bat 'mvn compile'
             }
         }
-
- 
-
- 
-
         stage('Test') {
             steps {
                 bat 'mvn test'
             }
         }
-        stage('SonarQube Analysis') {
+        stage('Package') {
             steps {
-                    bat 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.8.0.2131:sonar -Dsonar.login=admin -Dsonar.password=Sunitha@2028'
+                bat 'mvn package'
+            }
+            post {
+                always {
+                    // One or more steps need to be included within each condition's block.
+                    junit 'target/surefire-reports/*.xml'
                 }
+                success {
+                    archiveArtifacts artifacts: 'target/*.jar', followSymlinks: false
+                }
+            }
         }
-
- 
-
- 
-
-       stage("Deployment") {
-           steps{
-    bat 'start /B mvnw spring-boot:run -Dserver.port=8001'
-}
-       }
+        stage('Deploy') {
+            steps {
+                withEnv(['JENKINS_NODE_COOKIE=dontKillMe']) {
+                    bat 'java -jar -DServer.port=9090 target\\User-Service1-0.0.1-SNAPSHOT.jar'
+                }
+            }
+        }
     }
 }
 
-has context menu
+
+
+
+
+
+
+
+
+
+
+
+
